@@ -1,0 +1,470 @@
+<!doctype html>
+<html>
+<!--Peli alkaa, saat 1-10 Hit Pointtia, 3 Taikaa joita ei saa takaisin ja eteen tulee random vihollinen
+	Isku napista yrität lyödä, peli menee D&D säännöillä eli heitetään 20 sivuinen noppa ja lisätään isku bonus, 
+	jos se menee vihollisen armori luokan yli isku osuu, lisäksi jos nopan numero on 18-20 Ja isku ylittää armoriluokan 5
+	on kyseessä kriittinen osuma. Normaali osuma tekee 1-12 damagea (Yksi 12 sivuinen noppa), Kriittinen osuma tekee 2-24 (Kaksi 12 sivuista noppaa)
+	damageen lisätään iskubonus.
+	
+	Jokainen vihollinen antaa kokemus pisteitä vaikeudesta riippuen, jos pisteet ylittävät 2k saat levelin eli 1-10 HPta lisää, HP täyttyvät ja iskubonus nousee.
+	Seuraavan levelin raja siirtyy taas kauvemmaksi.
+	
+	Voit myös löytää taika miekan tai kilven jotka lisäävät armori luokkaasi ja isku bonusta.
+	
+	Taika tekee paljon damagea 8d6 (Kahdeksan 6 sivuista noppaa) siksi niitä onkin rajallinen määrä.
+	
+	Jos vastaan tulee lohikäärme ja sen voittaa, on peli voitettu. Sen voittaminen on tosin mahdotonta...
+	
+	Jokaisella hirviöllä on eri esiintymis mahdollisuus, eri HP:t, eri XP arvo jonka sen voittamisesta saa, ja eri damage jota se sinnuun tekee (jos osuu).
+	
+	Lohikäärme tosin osuu aina, damagesta voi ottaa vain puolet jos käy hyvä tsäkä, silti se tappaa lähes aina.
+-->
+	<head>
+		<meta charset="utf-8">
+		<title>Luolat & Lohikäärmeet</title>
+		<style>
+			body{
+			margin:auto;
+			width:960px;
+			margin-top:50px;
+			}
+			#canv
+			{
+			border: 1px solid black;
+			background-color:#2c2c2c;
+			}
+			#stats
+			{
+			float:left;
+			height:480px;
+			width:150px;
+			border:solid black 1px;
+			}
+			p
+			{
+			padding:2px;
+			margin:5px;
+			}
+		</style>
+	</head>
+	<body>
+	<audio autoplay loop id="musa">
+	<source src="aani/musa.wav" type="audio/wav">
+	</audio>
+	<div id="col1">
+	</div>
+	<img id="tulipallo" src="kuvat/Fireball.png" height="200" style="display:none;"></img>
+	<img id="koplini" src="kuvat/Koplini.png" height="200" style="display:none;"></img>
+	<img id="luola" src="kuvat/Luola.png" height="200" style="display:none;"></img>
+	<img id="morokolli" src="kuvat/Morokolli.png" height="200" style="display:none;"></img>
+	<img id="lihahirvio" src="kuvat/Lihahirviö.png" height="200" style="display:none;"></img>
+	<img id="koiramies" src="kuvat/Koiramies.png" height="200" style="display:none;"></img>
+	<img id="Lohi" src="kuvat/Punainen Lohikäärme.png" height="200" style="display:none;"></img>
+	<img id="Kivijatti" src="kuvat/KiviJätti.png" height="200" style="display:none;"></img>
+	<img id="miekka" src="kuvat/miekka.png" height="200" style="display:none;"></img>
+	<img id="kilpi" src="kuvat/kilpi.png" height="200" style="display:none;"></img>
+	<img id="ani" src="kuvat/ani.png" height="200" style="display:none;"></img>
+	<div id="stats">HP:<p id="hp"></p>XP:<p id="xp">0/2000</p>Isku bonus:<p id="iskubonus">0</p>Armori luokkasi:<p id="armori"></p>Taikoja Jäljellä:<p id="taikoja">3/3</p>
+	<div id="napit">
+	<button type="button" id="lyonappi" onclick="lyo()">Lyö</button>
+	<button type="button" onclick="puhu()">Puhu</button>
+	<button type="button" id="taikanappi" onclick="taijo()">Taijo</button>
+	</div>
+	<button type="button" id="seuraava" onclick="next()" style="visibility:hidden;">Seuraavaan Taisteluun</button>
+	<div id="info">
+	</div>
+	<button type="button" id="uusipeli" onclick="location.reload()" style="visibility:hidden;">Pelaa Uudestaan</button>
+	</div>	
+		<canvas width="800px" height="480px" id="canv">
+		</canvas>
+		<div id="info2"></div>
+		<script>
+		var vola = document.getElementById("musa");
+		vola.volume = 0.2;
+		var encounter = "";
+		var hpmax = Math.floor(Math.random()*10)+1+1000;
+		var hp = hpmax;
+		document.getElementById("hp").innerHTML = hp + "/" + hpmax;
+		var enemyhp = 0;
+		var taikoja = 3;
+		var mpower = 0;
+		var isenemy = 0;
+		var xp = 0;
+		var xptresh = 2000;
+		var enemyxp = 0;
+		var enemytohit = 0;
+		var enemydmg = 0;
+		var playerAC = 15;
+		
+		var breath = 0;
+		
+		var c = document.getElementById("canv");
+		var ctx = c.getContext("2d")
+		var img = document.getElementById("koplini");
+		
+		window.onload = function(){
+		drawEnemy();
+		}
+		//Laittaa randomin vihun kuvan näkymään
+		function drawEnemy()
+		{
+			document.getElementById("armori").innerHTML = playerAC;
+			document.getElementById("napit").style.visibility = "visible";
+			encounter = Math.floor(Math.random()*100);
+			
+			ctx.clearRect(0, 0, canv.width, canv.height);			
+			//document.getElementById("asdasd").innerHTML = "Lyö";
+			if (encounter < 30){
+				img = document.getElementById("koplini");
+				isenemy = 1;
+				enemyxp = 150;
+				enemytohit = 0;
+				enemydmg = 1;
+				document.getElementById("info").innerHTML = "Vihreä viinapiru ryömii ulos luolasta ja heiluttaa puukkoaan uhkaavasti sinun suuntaan.";
+			}
+			else if(encounter < 60){
+				img = document.getElementById("koiramies");
+				isenemy = 1;
+				enemyxp = 70;
+				enemytohit = -1;
+				enemydmg = 0;
+				document.getElementById("info").innerHTML = "Punainen koiramies naurahtaa ja heiluttaa linkoaan.";
+			}
+			else if(encounter < 75){
+				img = document.getElementById("morokolli");
+				isenemy = 1;
+				enemyxp = 520;
+				enemytohit = 3;
+				enemydmg = 2;
+				document.getElementById("info").innerHTML = "Mörökölli hyökkää!! Vai onkohan se Timo Soini? Joka tapauksessa se yrittää hakata sut.";
+			}
+			else if(encounter < 78){
+				img = document.getElementById("Kivijatti");
+				isenemy = 1;
+				enemyxp = 7000;
+				enemytohit = 13;
+				enemydmg = 3;
+				document.getElementById("info").innerHTML = "Kivi jätti kiipeää luolasta ja aikoo murskata sinut.";
+			}
+			else if(encounter < 85){
+				img = document.getElementById("lihahirvio");
+				isenemy = 1;
+				enemyxp = 2000;
+				enemytohit = 9;
+				enemydmg = 4;
+				document.getElementById("info").innerHTML = "Lihahirviö liikkuu hitaasti mutta vakaasti sinun suuntaan.";
+			}
+			else if(encounter < 88){
+				img = document.getElementById("Lohi");
+				isenemy = 1;
+				enemyxp = 12000;
+				enemytohit = 13;
+				enemydmg = 5;
+				document.getElementById("info").innerHTML = "Loppu tulee, Punainen Lohikäärme haukkaa henkeä ja puhaltaa kohta tulta naamallesi.";
+			}	
+			else if(encounter < 94){
+				img = document.getElementById("miekka");
+				document.getElementById("info").innerHTML = "Löysit taikamiekan +1 osumiin ja damageen";
+				mpower = mpower + 1;
+				isenemy = 0;
+				document.getElementById("napit").style.visibility = "hidden";
+			}
+			else
+				{
+				img = document.getElementById("kilpi");
+				document.getElementById("info").innerHTML = "Löysit taikakilven +1 armoriisi";
+				playerAC = playerAC + 1;
+				isenemy = 0;
+				document.getElementById("napit").style.visibility = "hidden";
+				}			
+			ctx.drawImage(img, 80, 40);
+			if(isenemy < 1)
+				{
+				document.getElementById("seuraava").style.visibility = "visible";
+				}
+			else
+				{
+				newenemy();
+				document.getElementById("seuraava").style.visibility = "hidden";
+				}
+			document.getElementById("iskubonus").innerHTML = mpower;
+			document.getElementById("armori").innerHTML = playerAC;
+			}
+			//HYÖKKÄYS
+			var eAC = 10;
+			function newenemy(){
+				isenemy = 1;
+				if (encounter < 30){
+				eAC = 10;
+				enemyhp = (Math.floor(Math.random()*8+1)) ;
+				}
+				else if(encounter < 60){
+				eAC = 9;
+				enemyhp = Math.floor(Math.random()*5)+1;
+				}
+				else if(encounter < 75){
+				eAC = 15;
+				for(i = 0;i < 4;i++)
+				{
+				enemyhp = enemyhp + Math.floor(Math.random()*8)+1;
+				}
+				}
+				else if(encounter < 78){
+				eAC = 20;
+				for(i = 0;i < 14;i++)
+				{
+				enemyhp = enemyhp + Math.floor(Math.random()*8)+1;
+				}
+				}
+				else if(encounter < 85){
+				eAC = 11;
+				for(i = 0;i<9;i++){
+				enemyhp = enemyhp + Math.floor(Math.random()*8)+1;
+				}
+				}
+				else if(encounter < 88){
+				eAC = 23;
+				for(i = 0;i<15;i++){
+				enemyhp = enemyhp + Math.floor(Math.random()*8)+1;
+				isenemy = 0;
+				}
+				}
+				//document.getElementById("info2").innerHTML += enemyhp;
+			}
+			function puhu(){
+				document.getElementById("info").innerHTML = "Yrität puhua mutta otus ei ymmärrä. ";
+				vihuLyo();
+				}
+			//Isku nappi, 
+			function lyo(){
+			hit();
+			var isku = Math.floor(Math.random()*20)+1 + mpower;
+			var dmg = 0;
+			var audio = new Audio('aani/swing.wav');
+			audio.play();
+			if(isku >= eAC){
+			dmg = Math.floor(Math.random()*12)+1+mpower;
+			document.getElementById("info").innerHTML =  "Osuit ja teit " + dmg + " vahinkoa"+ "</br>";
+			enemyhp = enemyhp - dmg;
+			var audio = new Audio('aani/mhit.wav');
+			audio.play();
+			}
+			else if(isku == 20){
+			dmg = Math.floor(Math.random()*12)+1+mpower;
+			document.getElementById("info").innerHTML = "Osuit ja teit " + dmg + " vahinkoa"+ "</br>";
+			enemyhp = enemyhp - dmg;
+			var audio = new Audio('aani/mhit.wav');
+			audio.play();
+			}
+			else{
+			document.getElementById("info").innerHTML = "Löit ohi" + "</br>";
+			}
+			if(isku >= eAC + 5 && isku > 17){
+			dmg = (Math.floor(Math.random()*12)+1) + (Math.floor(Math.random()*12)+1) + mpower;
+			document.getElementById("info").innerHTML = "Kriittinen osuma!!!" + dmg + " vahinkoa"+ "</br>";
+			enemyhp = enemyhp - dmg;
+			}
+			if(enemyhp < 1){
+			
+			img = document.getElementById("luola");
+			ctx.drawImage(img, 80, 40);
+			document.getElementById("info").innerHTML += "</br>" + "Vihollinen on voitettu!";
+			document.getElementById("seuraava").style.visibility = "visible";
+			document.getElementById("napit").style.visibility = "hidden";
+			
+			xp = xp + enemyxp;
+			//LEVEL UP!!!
+			if(xp > xptresh){
+			hpmax = hpmax + Math.floor(Math.random()*10)+1;
+			hp = hpmax;
+			mpower = mpower + 1;
+			xptresh = xptresh + 2000;
+			document.getElementById("hp").innerHTML = hp + "/" + hpmax;
+			}
+			document.getElementById("xp").innerHTML = xp + "/" + xptresh;
+			if(encounter < 88 && encounter > 84){
+			victory();
+			}
+			}
+			//document.getElementById("info2").innerHTML += "</br>" + enemyhp;
+			if(enemyhp > 1){
+			setTimeout(vihuLyo, 200);
+			}
+			}
+			//Vihu LYÖ!!!!!!
+			function vihuLyo(){
+			var visku = 0;
+			var vdmg = 0;
+			
+			var audio = new Audio('aani/swing.wav');
+			audio.play();
+			if(enemytohit == 0)
+			{
+			visku = Math.floor(Math.random()*20)+1;
+			vdmg = Math.floor(Math.random()*6)+1;				
+			}
+			else if(enemytohit == -1)
+			{
+			visku = Math.floor(Math.random()*20)+0;
+			vdmg = Math.floor(Math.random()*4)+1;				
+			}
+			else if(enemytohit == 3)
+			{
+			visku = Math.floor(Math.random()*20)+4;
+			vdmg = Math.floor(Math.random()*10)+7;				
+			}
+			else if(enemydmg == 3)
+			{
+			visku = Math.floor(Math.random()*20)+13;
+			vdmg = (Math.floor(Math.random()*6)+1) + (Math.floor(Math.random()*6)+1) + 8;				
+			}
+			else if(enemydmg == 4)
+			{
+			visku = Math.floor(Math.random()*20)+9;
+			vdmg = (Math.floor(Math.random()*8)+1) + (Math.floor(Math.random()*8)+1);				
+			}
+			else if(enemydmg == 5)
+			{
+			breath = breath + 1;
+			visku = Math.floor(Math.random()*20)+13;
+			vdmg = (Math.floor(Math.random()*10)+1) + (Math.floor(Math.random()*10)+1) + (Math.floor(Math.random()*10)+1);
+			}
+			if(breath == 1){
+			vdmg = (Math.floor(Math.random()*10)+1) + (Math.floor(Math.random()*10)+1) + (Math.floor(Math.random()*10)+1) + (Math.floor(Math.random()*10)+1) + (Math.floor(Math.random()*10)+1) + (Math.floor(Math.random()*10)+1) + (Math.floor(Math.random()*10)+1) + (Math.floor(Math.random()*10)+1) + 4;				
+
+			var audio = new Audio('aani/phit.wav');
+			audio.play();
+			var save = Math.floor(Math.random()*20)+1;
+			if(save >= 17){
+			hp = hp - vdmg/2;
+			document.getElementById("info").innerHTML += "Lohikäärme syöksee tulta ja väistät sen osittain, kärsit silti " + vdmg/2 + "Vahinkoa";
+			}
+			else{
+			hp = hp - vdmg;
+			document.getElementById("info").innerHTML += "Lohikäärme syöksee tulta etkä ennätä pois alta, kärsit " + vdmg + " Vahinkoa";
+			}
+			document.getElementById("hp").innerHTML = hp + "/" + hpmax;
+			breath = -3;
+			}
+			else if(visku > playerAC){
+			document.getElementById("info").innerHTML += "Vihu osuu sinuun aseellaan ja tekee: " + vdmg + "vahinkoa";
+			hp = hp - vdmg;
+			var audio = new Audio('aani/phit.wav');
+			audio.play();
+			document.getElementById("hp").innerHTML = hp + "/" + hpmax;
+			}
+			else{
+			document.getElementById("info").innerHTML += "Vihu lyö ohi";
+			}
+			if(hp<1){
+			document.getElementById("info").innerHTML += "</br>" + "KUOLEMA!";
+			gameOver();
+			var audio = new Audio('aani/defeat.wav');
+			audio.play();
+			document.getElementById("musa").src = "";
+			}
+			}
+			function next(){
+			document.getElementById("info").innerHTML = "";
+			document.getElementById("info2").innerHTML = "";
+			drawEnemy();
+			newenemy();
+			}
+			function gameOver(){
+			document.getElementById("uusipeli").style.visibility = "visible";
+			document.getElementById("napit").style.visibility = "hidden";
+			document.getElementById("canv").style.backgroundColor = "darkred";
+			}
+			function hit(){
+			var y = 420;
+			var c1 = document.getElementById("canv");
+			var ctx1 = c1.getContext("2d");
+			var img1 = document.getElementById("ani");
+			ylos();
+			function piirto(){
+			ctx1.clearRect(0, 0, canv.width, canv.height);
+			ctx.drawImage(img, 80, 40);
+			ctx1.drawImage(img1, 320, y);
+			}
+			function ylos(){
+			if(y > 300){
+			y = y - 20;
+			if(y < 320){
+			alas();
+			}
+			else{
+			setTimeout(ylos,16);
+			piirto();
+			}
+			}
+			}
+			function alas(){
+			y = y + 20;
+			piirto();
+			if(y > 450){
+			} 
+			else{
+			setTimeout(alas,16);
+			}
+			}
+			}
+			function victory(){
+			var audio = new Audio("aani/voitto.wav");
+			audio.play();
+			vola.volume = 0;
+			document.getElementById("info").innerHTML = "VOITIT PELIN!!! en tiedä miten sillä se on lähes mahdotonta.";
+			document.getElementById("uusipeli").style.visibility = "visible";
+			document.getElementById("seuraava").style.visibility = "hidden";
+			document.getElementById("napit").style.visibility = "hidden";
+			document.getElementById("canv").style.backgroundColor = "green";
+			}
+			function taijo(){
+			var audio = new Audio('aani/taika.wav');
+			audio.play();
+			var img3 = document.getElementById("tulipallo");
+			var c1 = document.getElementById("canv");
+			var ctx1 = c1.getContext("2d");
+			ctx1.drawImage(img3, 250, 140);
+			dmg = (Math.floor(Math.random()*6)+1) + (Math.floor(Math.random()*6)+1) + (Math.floor(Math.random()*6)+1) + (Math.floor(Math.random()*6)+1) + (+Math.floor(Math.random()*6)+1) + (Math.floor(Math.random()*6)+1) + (Math.floor(Math.random()*6)+1);
+			
+			enemyhp = enemyhp - dmg;
+			document.getElementById("info").innerHTML = "Heität otusta tulipallolla ja teet: " + dmg + " Vahinkoa </br>";
+			setTimeout(delayed,200);
+			function delayed(){
+			if(enemyhp < 1){
+			
+			img = document.getElementById("luola");
+			ctx.drawImage(img, 80, 40);
+			document.getElementById("info").innerHTML += "</br>" + "Vihollinen on voitettu!";
+			document.getElementById("seuraava").style.visibility = "visible";
+			document.getElementById("napit").style.visibility = "hidden";
+			if(encounter < 88 && encounter > 84){
+			victory();
+			}
+			xp = xp + enemyxp;
+			//LEVEL UP!!!
+			if(xp > xptresh){
+			hpmax = hpmax + Math.floor(Math.random()*10)+1;
+			hp = hpmax;
+			xptresh = xptresh + 2000;
+			document.getElementById("hp").innerHTML = hp + "/" + hpmax;
+			}
+			document.getElementById("xp").innerHTML = xp + "/" + xptresh;
+			
+			}
+			//document.getElementById("info2").innerHTML += "</br>" + enemyhp;
+			if(enemyhp > 1){
+			setTimeout(vihuLyo, 200);
+			ctx.drawImage(img, 80, 40);
+			}
+			}
+			taikoja = taikoja - 1;
+			document.getElementById("taikoja").innerHTML = taikoja + "/3";
+			if(taikoja < 1){
+			document.getElementById("info").innerHTML += "Taikasi on lopussa";
+			document.getElementById("taikanappi").disabled = true;
+			}
+			}
+		</script>
+	</body>
+</html>
