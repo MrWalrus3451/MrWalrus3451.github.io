@@ -113,7 +113,7 @@
 			
 			ctx.clearRect(0, 0, canv.width, canv.height);			
 			//document.getElementById("asdasd").innerHTML = "Lyö";
-			if (encounter < 30){
+			if (encounter < 35){
 				img = document.getElementById("koplini");
 				isenemy = 1;
 				enemyxp = 150;
@@ -121,7 +121,7 @@
 				enemydmg = 1;
 				document.getElementById("info").innerHTML = "Vihreä viinapiru ryömii ulos luolasta ja heiluttaa puukkoaan uhkaavasti sinun suuntaan.";
 			}
-			else if(encounter < 60){
+			else if(encounter < 70){
 				img = document.getElementById("koiramies");
 				isenemy = 1;
 				enemyxp = 70;
@@ -137,7 +137,7 @@
 				enemydmg = 2;
 				document.getElementById("info").innerHTML = "Mörökölli hyökkää!! Vai onkohan se Timo Soini? Joka tapauksessa se yrittää hakata sut.";
 			}
-			else if(encounter < 78){
+			else if(encounter < 77){
 				img = document.getElementById("Kivijatti");
 				isenemy = 1;
 				enemyxp = 7000;
@@ -145,7 +145,7 @@
 				enemydmg = 3;
 				document.getElementById("info").innerHTML = "Kivi jätti kiipeää luolasta ja aikoo murskata sinut.";
 			}
-			else if(encounter < 85){
+			else if(encounter < 82){
 				img = document.getElementById("lihahirvio");
 				isenemy = 1;
 				enemyxp = 2000;
@@ -153,7 +153,7 @@
 				enemydmg = 4;
 				document.getElementById("info").innerHTML = "Lihahirviö liikkuu hitaasti mutta vakaasti sinun suuntaan.";
 			}
-			else if(encounter < 88){
+			else if(encounter < 83){
 				img = document.getElementById("Lohi");
 				isenemy = 1;
 				enemyxp = 12000;
@@ -161,7 +161,7 @@
 				enemydmg = 5;
 				document.getElementById("info").innerHTML = "Loppu tulee, Punainen Lohikäärme haukkaa henkeä ja puhaltaa kohta tulta naamallesi.";
 			}	
-			else if(encounter < 94){
+			else if(encounter < 92){
 				img = document.getElementById("miekka");
 				document.getElementById("info").innerHTML = "Löysit taikamiekan +1 osumiin ja damageen";
 				mpower = mpower + 1;
@@ -445,6 +445,7 @@
 			if(xp > xptresh){
 			hpmax = hpmax + Math.floor(Math.random()*10)+1;
 			hp = hpmax;
+			taikoja = 3;
 			xptresh = xptresh + 2000;
 			document.getElementById("hp").innerHTML = hp + "/" + hpmax;
 			}
