@@ -302,12 +302,18 @@
 			if(encounter == 82){
 			victory();
 			}
+			
 			}
 			//document.getElementById("info2").innerHTML += "</br>" + enemyhp;
 			if(enemyhp > 0){
-			setTimeout(vihuLyo, 200);
+			setTimeout(vihuLyo, 100);
+			setTimeout(KoolDownOff, 150);
 			}
 			}
+			function KoolDownOff(){
+			cooldown = false;
+			}
+			
 			//Vihu LYÖ!!!!!!
 			function vihuLyo(){
 			var visku = 0;
