@@ -79,15 +79,17 @@
 		</canvas>
 		<div id="info2"></div>
 		<script>
+		cooldown = false;
 		window.onkeyup = function(e) {
    		var key = e.keyCode ? e.keyCode : e.which;
-		if(hp > 0){
+		if(hp > 0 && !cooldown){
    		if (key == 32 && isenemy == 1) {
        			lyo();
+			cooldown = true;
    		}
 		else if (key == 32 && isenemy == 0){
        			next();
-  				 }
+  			cooldown = true;	 }
 			}
 		}
 		var vola = document.getElementById("musa");
@@ -204,6 +206,7 @@
 			//HYÖKKÄYS
 			var eAC = 10;
 			function newenemy(){
+				cooldown = false;
 				isenemy = 1;
 				if (encounter < 35){
 				eAC = 10;
