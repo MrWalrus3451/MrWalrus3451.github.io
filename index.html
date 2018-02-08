@@ -277,6 +277,8 @@
 			hpmax = hpmax + Math.floor(Math.random()*10)+1;
 			hp = hpmax;
 			taikoja = 3;
+			document.getElementById("taikanappi").disabled = false;
+			document.getElementById("taikoja").innerHTML = taikoja + "/3";
 			mpower = mpower + 1;
 			xptresh = xptresh + 2000;
 			document.getElementById("hp").innerHTML = hp + "/" + hpmax;
@@ -447,6 +449,8 @@
 			hpmax = hpmax + Math.floor(Math.random()*10)+1;
 			hp = hpmax;
 			taikoja = 3;
+			document.getElementById("taikanappi").disabled = false;
+			document.getElementById("taikoja").innerHTML = taikoja + "/3";
 			xptresh = xptresh + 2000;
 			document.getElementById("hp").innerHTML = hp + "/" + hpmax;
 			}
