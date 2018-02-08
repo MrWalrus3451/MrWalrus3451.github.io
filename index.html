@@ -226,7 +226,6 @@
 				eAC = 23;
 				for(i = 0;i<15;i++){
 				enemyhp = enemyhp + Math.floor(Math.random()*8)+1;
-				isenemy = 0;
 				}
 				}
 				//document.getElementById("info2").innerHTML += enemyhp;
@@ -447,7 +446,7 @@
 			}
 			xp = xp + enemyxp;
 			//LEVEL UP!!!
-			if(xp > xptresh){
+			if(xp >= xptresh){
 			hpmax = hpmax + Math.floor(Math.random()*10)+1;
 			hp = hpmax;
 			mpower += 1;
