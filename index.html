@@ -61,7 +61,8 @@
 	<img id="koiramies" src="kuvat/Koiramies.png" height="200" style="display:none;"></img>
 	<img id="Lohi" src="kuvat/Punainen Lohikäärme.png" height="200" style="display:none;"></img>
 	<img id="Kivijatti" src="kuvat/KiviJätti.png" height="200" style="display:none;"></img>
-	<img id="miekka" src="kuvat/miekka.png" height="200" style="display:none;"></img	<img id="kilpi" src="kuvat/kilpi.png" height="200" style="display:none;"></img>
+	<img id="miekka" src="kuvat/miekka.png" height="200" style="display:none;"></img>	
+	<img id="kilpi" src="kuvat/kilpi.png" height="200" style="display:none;"></img>
 	<img id="ani" src="kuvat/ani.png" height="200" style="display:none;"></img>
 	<div id="stats">HP:<p id="hp"></p>XP:<p id="xp">0/2000</p>Isku bonus:<p id="iskubonus">0</p>Armori luokkasi:<p id="armori"></p>Taikoja Jäljellä:<p id="taikoja">3/3</p>
 	<div id="napit">
@@ -448,6 +449,8 @@
 			if(xp > xptresh){
 			hpmax = hpmax + Math.floor(Math.random()*10)+1;
 			hp = hpmax;
+			mpower += 1;
+			playerAC += 1;
 			taikoja = 3;
 			document.getElementById("taikanappi").disabled = false;
 			document.getElementById("taikoja").innerHTML = taikoja + "/3";
