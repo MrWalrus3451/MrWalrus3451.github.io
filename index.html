@@ -168,17 +168,16 @@
 				isenemy = 0;
 				document.getElementById("napit").style.visibility = "hidden";
 			}
-			else
-				{
+			else{
 				img = document.getElementById("kilpi");
 				document.getElementById("info").innerHTML = "Löysit taikakilven +1 armoriisi";
 				playerAC = playerAC + 1;
 				isenemy = 0;
 				document.getElementById("napit").style.visibility = "hidden";
 				ctx.drawImage(img, 80, 40);
-				}			
+			}			
 			ctx.drawImage(img, 80, 40);
-			if(isenemy < 1)
+			if(isenemy == 0)
 				{
 				document.getElementById("seuraava").style.visibility = "visible";
 				}
