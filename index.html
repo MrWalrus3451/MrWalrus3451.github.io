@@ -79,6 +79,17 @@
 		</canvas>
 		<div id="info2"></div>
 		<script>
+		window.onkeyup = function(e) {
+   		var key = e.keyCode ? e.keyCode : e.which;
+
+   		if (key == 32 && isenemy == 1) {
+       			lyo();
+   		}
+		else if (key == 32 && isenemy == 0){
+       			next();
+  				 }
+			}
+			
 		var vola = document.getElementById("musa");
 		vola.volume = 0.2;
 		var encounter = "";
