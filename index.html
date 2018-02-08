@@ -81,7 +81,7 @@
 		<script>
 		window.onkeyup = function(e) {
    		var key = e.keyCode ? e.keyCode : e.which;
-
+		if(hp > 0){
    		if (key == 32 && isenemy == 1) {
        			lyo();
    		}
@@ -89,7 +89,7 @@
        			next();
   				 }
 			}
-			
+		}
 		var vola = document.getElementById("musa");
 		vola.volume = 0.2;
 		var encounter = "";
