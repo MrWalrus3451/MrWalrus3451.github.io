@@ -275,7 +275,7 @@
 			enemyhp = enemyhp - dmg;
 			}
 			if(enemyhp < 1){
-			
+			isenemy = 0;
 			img = document.getElementById("luola");
 			ctx.drawImage(img, 80, 40);
 			document.getElementById("info").innerHTML += "</br>" + "Vihollinen on voitettu!";
@@ -379,6 +379,7 @@
 			}
 			}
 			function next(){
+			
 			document.getElementById("info").innerHTML = "";
 			document.getElementById("info2").innerHTML = "";
 			drawEnemy();
