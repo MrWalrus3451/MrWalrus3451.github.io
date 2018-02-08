@@ -86,10 +86,13 @@
    		if (key == 32 && isenemy == 1) {
        			lyo();
 			cooldown = true;
+			setTimeout(KoolDownOff, 225);
    		}
 		else if (key == 32 && isenemy == 0){
        			next();
-  			cooldown = true;	 }
+  			cooldown = true;	 
+			setTimeout(KoolDownOff, 225);
+				}
 			}
 		}
 		var vola = document.getElementById("musa");
@@ -206,7 +209,7 @@
 			//HYÖKKÄYS
 			var eAC = 10;
 			function newenemy(){
-				cooldown = false;
+				
 				isenemy = 1;
 				if (encounter < 35){
 				eAC = 10;
@@ -306,8 +309,8 @@
 			}
 			//document.getElementById("info2").innerHTML += "</br>" + enemyhp;
 			if(enemyhp > 0){
-			setTimeout(vihuLyo, 100);
-			setTimeout(KoolDownOff, 150);
+			setTimeout(vihuLyo, 200);
+			
 			}
 			}
 			function KoolDownOff(){
@@ -386,7 +389,7 @@
 			audio.play();
 			document.getElementById("musa").src = "";
 			}
-				cooldown = false;
+				
 			}
 			function next(){
 			
